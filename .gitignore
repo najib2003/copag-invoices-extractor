@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/uploads/
+data/rendered_pages/
+data/processed/
+data/exports/
+data/temp/
+data/logs/
+.vscode/
+.idea/
