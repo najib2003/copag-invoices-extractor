@@ -14,10 +14,10 @@ class OCRResult:
     source: str = "original"
     image_path: Path | None = None
     page_number: int | None = None
-    metadata: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)#anything that doesn't deserve its own field
 
     @property
-    def raw_text(self) -> str:
+    def raw_text(self) -> str:#for regex
         return "\n".join(line.text for line in self.lines if line.text)
 
     @property
@@ -30,7 +30,7 @@ class OCRResult:
     def line_count(self) -> int:
         return len(self.lines)
 
-    def sorted_lines(self) -> list[OCRLine]:
+    def sorted_lines(self) -> list[OCRLine]:# correct lines order 
         return sorted(self.lines, key=lambda line: (line.page_number or 0, line.top, line.left))
 
     def to_dict(self) -> dict[str, Any]:
