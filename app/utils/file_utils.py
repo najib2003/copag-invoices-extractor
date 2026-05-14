@@ -1,5 +1,3 @@
-"""Filesystem helpers for local-only batch processing."""
-
 from __future__ import annotations
 
 import re
@@ -7,12 +5,20 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
-from app.config import config, ensure_data_directories
-
 
 def safe_filename(name: str) -> str:
-    stem = re.sub(r"[^A-Za-z0-9._-]+", "_", name.strip())
-    return stem.strip("._") or "file"
+    """Return a filesystem-safe filename."""
+
+    cleaned = re.sub(r"\s+", "_", name.strip())
+    cleaned = re.sub(r"[^A-Za-z0-9._-]", "", cleaned)
+    cleaned = cleaned.strip("._")
+    return cleaned or "file"
+
+
+def timestamp_slug() -> str:
+    """Return a sortable timestamp including microseconds."""
+
+    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")
 
 
 def ensure_parent(path: Path) -> Path:
@@ -20,28 +26,17 @@ def ensure_parent(path: Path) -> Path:
     return path
 
 
-def timestamp_slug() -> str:
-    return datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+def copy_to_uploads(
+    input_path: Path,
+    upload_dir: Path | None = None,
+    output_name: str | None = None,
+) -> Path:
+    """Copy a file into the upload directory and return the destination path."""
 
-
-def timestamped_dir(base: Path, prefix: str) -> Path:
-    directory = base / f"{safe_filename(prefix)}_{timestamp_slug()}"
-    directory.mkdir(parents=True, exist_ok=True)
-    return directory
-
-
-def copy_to_uploads(input_path: str | Path) -> Path:
-    ensure_data_directories()
-    source = Path(input_path)
-    target = config.upload_dir / f"{source.stem}_{timestamp_slug()}{source.suffix.lower()}"
-    shutil.copy2(source, target)
-    return target
-
-
-def is_pdf(path: str | Path) -> bool:
-    return Path(path).suffix.lower() in config.supported_pdf_extensions
-
-
-def is_image(path: str | Path) -> bool:
-    return Path(path).suffix.lower() in config.supported_image_extensions
+    destination_dir = upload_dir or Path("data") / "uploads"
+    destination_dir.mkdir(parents=True, exist_ok=True)
+    destination = destination_dir / (output_name or safe_filename(input_path.name))
+    ensure_parent(destination)
+    shutil.copy2(input_path, destination)
+    return destination
 

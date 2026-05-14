@@ -1,38 +1,27 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Any
 
-@dataclass
+
+@dataclass(slots=True)
 class LineItem:
-    prix_unitaire : float | None=None
-    quantite : float | None=None
-    total :float | None=None
-    confidence : float =0.0
-    source : str=""
+    designation: str | None = None
+    qte: float | None = None
+    prix: float | None = None
+    prix_unitaire_ht: float | None = None
+    total: float | None = None
+    total_ht: float | None = None
+    confidence: float | None = None
 
-    def to_export_row(
-            self,
-            nom_fournisseur: str | None=None,
-            total_ht: float | None = None,
-        tva: float | None = None,
-        ttc: float | None = None,
-    ) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
-            "nom_fournisseur": nom_fournisseur,
-            "prix_unitaire": self.prix_unitaire,
-            "quantite": self.quantite,
+            "designation": self.designation,
+            "qte": self.qte,
+            "prix": self.prix,
+            "prix_unitaire_ht": self.prix_unitaire_ht,
             "total": self.total,
-            "total_ht": total_ht,
-            "tva": tva,
-            "ttc": ttc,
+            "total_ht": self.total_ht,
+            "confidence": self.confidence,
         }
 
-    def to_dict(self) -> dict[str ,Any]:
-        return{
-            "prix_unitaire": self.prix_unitaire,
-            "quantite": self.quantite,
-            "total": self.total,
-            "confidence": self.confidence,
-            "source": self.source,
-        }
-    
